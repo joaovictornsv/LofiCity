@@ -6,7 +6,15 @@ Lo-fi pixel-art scenes that follow each city's **real clock** and **live weather
 
 **Cities** (pick one in the selector; Esperança is the default)
 
-- **Campina Grande**: `Açude Velho`, with the glass drums of the Museu de Arte Popular (the "Três Pandeiros") and the high-rises mirrored in the water; fireworks most nights of its famous São João in June.
+- **Campina Grande**: fireworks most nights of its famous São João in June.
+  - `Açude Velho`: the glass drums of the Museu de Arte Popular (the "Três Pandeiros") and the high-rises mirrored in the water.
+  - `Pirâmide do Parque do Povo` (`piramide-parque-do-povo`): the salmon concrete A-frame across an empty paved lot, with floodlight masts, a borracharia and the city's towers behind. Most of the year it stands quiet with its floodlights off; in June it fills up for the São João: bandeirolas, stalls and dancers under the roof, a fogueira, the floodlights on and "O MAIOR SÃO JOÃO DO MUNDO" in neon along its legs.
+  - `Estação Velha`: the yellow 1907 Great Western station, now the Museu do Algodão: terracotta roofs, white quoins, "GWBR" on the gable and the "CAMPINA GRANDE" plaque, the iron railing, a castanhola and the old steam locomotive under its pavilion. Doors open on lit rooms while the museum is open.
+  - `Parque da Criança`: a wide view across the park: the cycle and walking path, the sand field with a kickabout by day, royal and coconut palms, the "EU ♥ CORRER" letters, a cobbled plaza, the skate bowl and the old brick chimney, Catolé's towers beyond. No traffic; busiest with runners at dawn and late afternoon, nearly empty late at night.
+  - `Partage Shopping`: the mall on Av. Prefeito Severino Cabral: store boards, "ESTACIONAMENTO" over the parking entrance, the red flower emblem and "PARTAGE SHOPPING", the long salmon louvred façade, palms and a bus stop on the busy avenue. Signs and glass light up after dark while it is open.
+  - `Terminal de Integração`: the long bus terminal on R. Dom Pedro II: the "SITRANS / STTP" and "TARIFA ZERO" board, concrete fins (one with a painted mural), green railings and passengers on the benches. City buses pull into the bays, wait and leave, more often at rush hour, none in the small hours.
+
+  The five newer Campina scenes were drawn from Google Street View captures (Dec 2024 to Jan 2025, plus 360° photos posted to Google Maps for the park) and Wikimedia Commons photos, as reference only; none of the images are in the repo, and signs show only the lettering legible in them. Opening hours, bus frequency and festival details are art direction, not real timetables.
 - **João Pessoa**: `Orla do Cabo Branco`, the sea where the sun rises first in the Americas, jangadas, coconut palms and the triangular lighthouse on the cliff, its beam sweeping the sky at night.
 - **Areia**: `Centro Histórico`, the listed colonial town of the Brejo: casario with iron balconies, the Câmara Municipal, the Teatro Minerva (1859), a cachaça shop, cobbles and mist.
 - **Remígio**: `Lagoa de Remígio`, the round lagoon with royal palms, houses up the hill, the matriz on top and ducks on the water.
@@ -52,7 +60,7 @@ pnpm test       # unit tests for the bell schedule and timer, the daily rhythm, 
 ## URL options
 
 - `#city=esperanca` (also `campina`, `joaopessoa`, `areia`, `remigio`, `tokyo`)
-- `#scene=praca-matriz`: pin a scene (`praca-matriz`, `rua-comercio`, `capelinha`, `praca-cultura`, `campo-rodoviaria`, `centro-teatro`, `armazem-paraiba`, `rua-faustino`, `rua-jose-bezerra`, `acude-velho`, `cabo-branco`, `centro-areia`, `lagoa-remigio`, `rain-corner`, `neon-alley`, `konbini`, `shrine`)
+- `#scene=praca-matriz`: pin a scene (`praca-matriz`, `rua-comercio`, `capelinha`, `praca-cultura`, `campo-rodoviaria`, `centro-teatro`, `armazem-paraiba`, `rua-faustino`, `rua-jose-bezerra`, `acude-velho`, `piramide-parque-do-povo`, `estacao-velha`, `parque-da-crianca`, `partage-shopping`, `terminal-integracao`, `cabo-branco`, `centro-areia`, `lagoa-remigio`, `rain-corner`, `neon-alley`, `konbini`, `shrine`)
 - `#at=2026-12-24T22:00`: freeze a moment in the city's time zone (for testing; the UI always uses real time)
 - `#debug`: technical panel (for development)
 - `#wx=rain`: test override for previews (`clear`, `cloudy`, `rain`, `snow`, `storm`, `fog`); the HUD marks it as a test, never as live

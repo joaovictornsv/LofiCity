@@ -7,8 +7,12 @@ import { lagoaRemigio } from './lagoa-remigio';
 import { campoRodoviaria } from './campo-rodoviaria';
 import { capelinha } from './capelinha';
 import { centroTeatro } from './centro-teatro';
+import { estacaoVelha } from './estacao-velha';
 import { konbini } from './konbini';
 import { neonAlley } from './neon-alley';
+import { parqueCrianca } from './parque-da-crianca';
+import { partage } from './partage-shopping';
+import { piramide } from './piramide-parque-do-povo';
 import { pracaCultura } from './praca-cultura';
 import { praca } from './praca-matriz';
 import { rainCorner } from './rain-corner';
@@ -16,12 +20,13 @@ import { ruaComercio } from './rua-comercio';
 import { ruaFaustino } from './rua-faustino';
 import { ruaJoseBezerra } from './rua-jose-bezerra';
 import { shrine } from './shrine';
+import { terminalIntegracao } from './terminal-integracao';
 import type { Scene } from './types';
 
 export const SCENES: Record<CityId, Scene[]> = {
   tokyo: [rainCorner, neonAlley, konbini, shrine],
   esperanca: [praca, ruaComercio, capelinha, pracaCultura, campoRodoviaria, centroTeatro, armazemParaiba, ruaFaustino, ruaJoseBezerra],
-  campina: [acudeVelho],
+  campina: [acudeVelho, piramide, estacaoVelha, parqueCrianca, partage, terminalIntegracao],
   joaopessoa: [caboBranco],
   areia: [centroAreia],
   remigio: [lagoaRemigio],

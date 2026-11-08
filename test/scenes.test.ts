@@ -23,7 +23,7 @@ const NEW = ['centro-teatro', 'armazem-paraiba', 'rua-faustino', 'rua-jose-bezer
 
 test('every scene id in SCENES is unique', () => {
   const ids = [...table.values()].flat().map(sceneId);
-  assert.ok(ids.length >= 17);
+  assert.ok(ids.length >= 22);
   assert.equal(new Set(ids).size, ids.length, `duplicate ids: ${ids}`);
 });
 
@@ -56,4 +56,23 @@ test('only scenes whose photo shows a zebra wire up a crossing', () => {
   assert.doesNotMatch(src('rua-jose-bezerra'), /yieldLimit|setBrCrossing/);
   // no random weather anywhere in the new scenes
   for (const id of NEW) assert.doesNotMatch(src(id), /S\.(rain|snow|storm|cloud|fog|temp)\s*=[^=]/);
+});
+
+const CAMPINA_NEW = ['piramide-parque-do-povo', 'estacao-velha', 'parque-da-crianca', 'partage-shopping', 'terminal-integracao'];
+
+test('Campina Grande has Açude Velho first, then the five new scenes', () => {
+  assert.deepEqual(table.get('campina')!.map(sceneId), ['acude-velho', ...CAMPINA_NEW]);
+});
+
+test('the README lists each new Campina #scene id', () => {
+  const line = read('README.md').split('\n').find((l) => l.startsWith('- `#scene='))!;
+  for (const id of CAMPINA_NEW) assert.ok(line.includes(`\`${id}\``), `${id} in the #scene list`);
+});
+
+test('the new Campina scenes follow the city rhythm and never set the weather', () => {
+  for (const id of CAMPINA_NEW) {
+    const at = Date.parse('2026-11-09T14:30-03:00');
+    assert.deepEqual(density('campina', id, at), density('campina', 'acude-velho', at));
+    assert.doesNotMatch(read(`src/scenes/${id}.ts`), /S\.(rain|snow|storm|cloud|fog|temp|wind)\s*=[^=]/);
+  }
 });
