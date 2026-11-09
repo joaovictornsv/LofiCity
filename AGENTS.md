@@ -52,4 +52,5 @@ pnpm test        # node --test on test/*.test.ts (Node >= 22.18 strips types; no
 
 - One feature branch per change; open a PR to `main`.
 - Merge only when the owner says so.
+- **Never force push** (`git push --force`, `--force-with-lease`, `+refspec`) to any branch, including your own feature branches. It is forbidden. To bring a branch up to date, merge `main` into it and push normally; if history really has to be rewritten, stop and ask the owner.
 - The coding agent is Claude Code (not Cursor): Sonnet for docs and simple tasks, Opus for app code.
