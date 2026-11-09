@@ -17,6 +17,7 @@ import {
 } from '../engine/palette';
 import { S, hourIn } from '../sky/state';
 import { PAST_LINE, type Phase, mayGo, nextCommitted, spawnDir } from './signal-rules';
+import { inService, schoolRun, skinForVehicle } from '../scenes/onibus-rules';
 import { besideAny, holdLimit, leadX, overlaps, queueLimit, yieldLimit } from './street-rules';
 
 type Kind = 'moto' | 'hatch' | 'sedan' | 'suv' | 'pickup' | 'fusca' | 'veraneio' | 'kombi' | 'van' | 'som' | 'pipa' | 'carroca' | 'bus' | 'micro' | 'escolar';
@@ -81,13 +82,14 @@ const LEN: Record<Kind, number> = { moto: 12, hatch: 26, sedan: 31, suv: 31, pic
 const CAR_COLORS = [TILEW, TILEW, TILEW, STONEL, STONEL, VOID, CRED, CBLUE, CNAVY, STONE, CBEIGE];
 
 function choose(v: V) {
-  const h = S.cal.hour, day = hourIn(h, 6, 18.5), late = h >= 23 || h < 5;
+  const h = S.cal.hour, day = hourIn(h, 6, 18.5);
   const w: [Kind, number][] = [
     ['moto', 44], ['hatch', 18], ['sedan', 6], ['suv', 5], ['pickup', 8], ['fusca', 1.5], ['veraneio', 1.5], ['kombi', 2], ['van', 2.5],
     ['som', day ? 2.5 : 0], ['pipa', day ? (S.cal.month >= 8 || S.cal.month <= 1 ? 4 : 1.5) : 0], ['carroca', day ? 4 : 0],
-    ['bus', late ? 0 : 3], ['micro', late ? 0 : 2],
+    // the city buses' hours and the school runs are shared with the bus interior (scenes/onibus-rules.ts)
+    ['bus', inService('saojose', S.cal.weekday, h) ? 3 : 0], ['micro', inService('micro', S.cal.weekday, h) ? 2 : 0],
     // prefeitura school buses at the start and end of each school shift on weekdays
-    ['escolar', S.cal.weekday >= 1 && S.cal.weekday <= 5 && (hourIn(h, 6, 7.8) || hourIn(h, 11, 13.5) || hourIn(h, 17, 18.5)) ? 6 : 0],
+    ['escolar', schoolRun(S.cal.weekday, h) ? 6 : 0],
   ];
   // #car=bus (or any kind) makes most spawns that kind, for previews
   const want = /car=(\w+)/.exec(location.hash)?.[1] as Kind | undefined;
@@ -456,12 +458,12 @@ const HORN: Record<Kind, 'moto' | 'car' | 'kombi' | 'bus' | 'truck' | 'bray' | '
   pipa: 'truck', carroca: 'bray', bus: 'bus', micro: 'bus', escolar: 'bus',
 };
 const TALL: Record<Kind, number> = { moto: 15, hatch: 13, sedan: 13, suv: 15, pickup: 14, fusca: 13, veraneio: 15, kombi: 16, van: 18, som: 24, pipa: 17, carroca: 24, bus: 22, micro: 19, escolar: 24 };
-/** A tapped vehicle: which horn to play and where to show the reaction. */
+/** A tapped vehicle: which horn to play, where to show the reaction, and the bus to board if it is one. */
 export function tapBr(x: number, y: number) {
   for (const v of VS) {
     if (!v.on) continue;
     const gy = laneY[v.lane];
-    if (x >= v.x - 2 && x <= v.x + v.len + 2 && y >= gy - TALL[v.kind] && y <= gy + 2) return { sound: HORN[v.kind], x: v.x + v.len / 2, y: gy - TALL[v.kind] };
+    if (x >= v.x - 2 && x <= v.x + v.len + 2 && y >= gy - TALL[v.kind] && y <= gy + 2) return { sound: HORN[v.kind], x: v.x + v.len / 2, y: gy - TALL[v.kind], board: skinForVehicle(v.kind) };
   }
   return null;
 }

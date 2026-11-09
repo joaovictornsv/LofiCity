@@ -26,6 +26,8 @@ import { followLive, weatherView } from './sky/live';
 import { hudWeather, manualLightningAllowed } from './sky/weather-feed';
 import { updateSky } from './scenes/common';
 import { nextScene, pickScene, sceneById } from './scenes';
+import { boardBus, busReturn, onibus } from './scenes/onibus';
+import type { BusSkin } from './scenes/onibus-rules';
 import type { Scene } from './scenes/types';
 import { cardFileName, shareUrl, viewHash } from './share-rules';
 import { copyText, downloadCanvas, drawCard } from './share';
@@ -93,6 +95,7 @@ function syncHash() {
   if (h !== location.hash) try { history.replaceState(history.state, '', h); } catch { /* sandboxed */ }
 }
 syncHash();
+syncExit();
 
 // ---------- HUD ----------
 const WEEK = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
@@ -171,6 +174,7 @@ function setCity(id: string) {
   scene.build();
   syncBells();
   syncHash();
+  syncExit();
   updateHud();
   if (hosted) pageview({ route: '/[city]', path: `/${city.id}` });
 }
@@ -180,13 +184,25 @@ addEventListener('pagehide', () => bells.dispose());
 addEventListener('pageshow', (e) => { if (e.persisted) syncBells(); }); // back from the bfcache
 /** Switches to another scene of the same city at the same moment (the scene button, or a door). */
 function enterScene(next: Scene) {
-  clearBubbles(); clearPeople(); scene = next; direct(simNow(), city, 0, scene.id); scene.build(); syncBells(); syncHash();
+  clearBubbles(); clearPeople(); scene = next; direct(simNow(), city, 0, scene.id); scene.build(); syncBells(); syncHash(); syncExit();
+}
+// Inside the bus, "Sair do ônibus" (or Esc) gets off: back to the scene it was boarded from, else the next scene.
+function syncExit() { $('b-exit').hidden = scene !== onibus; }
+function board(skin: BusSkin) {
+  boardBus(skin, scene.id); enterScene(onibus);
+  const h = scene.hint?.(); if (h) say(h.text, h);
+}
+function leaveBus() {
+  if (scene !== onibus) return;
+  const back = busReturn();
+  enterScene((back && sceneById(city.id, back)) || nextScene(city.id, scene));
 }
 const actions: Record<string, () => void> = {
   sound: () => { press('b-sound', audio.toggle()); syncBells(); },
   crt: () => { opts.crt = !opts.crt; press('b-crt', opts.crt); },
   city: () => cityMap.open(),
   scene: () => enterScene(nextScene(city.id, scene)),
+  exit: () => { if (!shareOpen) leaveBus(); },
   music: () => radio.toggle(),
   station: () => radio.nextStation(),
   skip: () => radio.skip(),
@@ -199,7 +215,7 @@ const actions: Record<string, () => void> = {
   },
 };
 const BUTTONS: [string, string][] = [
-  ['b-sound', 'sound'], ['b-crt', 'crt'], ['b-scene', 'scene'], ['b-full', 'full'],
+  ['b-exit', 'exit'], ['b-sound', 'sound'], ['b-crt', 'crt'], ['b-scene', 'scene'], ['b-full', 'full'],
 ];
 for (const [id, a] of BUTTONS) $(id).addEventListener('click', actions[a]);
 // City picker: a pixel map of Paraíba (src/ui/city-map.ts); it calls setCity, so transitions, weather and clock stay the same.
@@ -282,7 +298,7 @@ cardBtn.addEventListener('click', async () => {
 });
 
 const KEYS: Record<string, string> = {
-  m: 'sound', r: 'music', p: 'station', n: 'skip', c: 'crt', t: 'city', s: 'scene', l: 'lightning', h: 'hud', enter: 'full',
+  m: 'sound', r: 'music', p: 'station', n: 'skip', c: 'crt', t: 'city', s: 'scene', l: 'lightning', h: 'hud', enter: 'full', escape: 'exit',
 };
 addEventListener('keydown', (e) => {
   const tag = (e.target as HTMLElement).tagName;
@@ -314,11 +330,12 @@ $('view').addEventListener('pointerdown', (e) => {
   const p = tapPeople(x, y);
   if (p) { if (p.dog) sfx('bark'); speak({ role: 'passerby', track: p.track }, p.x, p.y); return; } // the dog still barks
   const c = tapCars(x, y);
-  if (c) { sfx(c.sound); emote(c.x, c.y, '♪'); return; }
+  if (c) { sfx(c.sound); if (c.board) board(c.board); else emote(c.x, c.y, '♪'); return; }
   const prop = scene.tap?.(x, y);
   // a door (e.g. the cinema in Remígio): the same scene change as the scene button, then the new scene's hint
   const to = prop?.goto ? sceneById(city.id, prop.goto) : null;
   if (to) { enterScene(to); const h = scene.hint?.(); if (h) say(h.text, h); return; }
+  if (prop?.board) { if (prop.sfx) sfx(prop.sfx); board(prop.board); return; }
   if (prop?.say) say(prop.say, prop);
   else if (prop?.speaker) speak(prop.speaker, prop.x, prop.y);
   else if (prop?.sfx) { sfx(prop.sfx); emote(prop.x, prop.y, '♪'); }
@@ -357,7 +374,7 @@ function frame(now: number) {
   drawEmotes(dt);
   gradePalette();
   scene.grade?.(); // indoor scenes light themselves
-  present(clock, S.shake, scene.grade ? 0 : S.dayK);
+  present(clock, S.shake, scene.grade && !scene.seesSky ? 0 : S.dayK);
   updateBubbles(now);
   workMs = workMs * 0.95 + (performance.now() - t0) * 0.05;
   frames++; fpsT += dt; uiT += dt; audioT += dt;

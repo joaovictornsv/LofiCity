@@ -16,9 +16,9 @@ test('a pinned moment stays in the hash, readable and round-trippable', () => {
 });
 
 test('the shared link drops test and developer options', () => {
-  const url = shareUrl('https://loficity-lac.vercel.app/#debug&wx=storm&car=bus&scene=x', { city: 'campina', scene: 'acude-velho' });
+  const url = shareUrl('https://loficity-lac.vercel.app/#debug&wx=storm&car=bus&bus=micro&scene=x', { city: 'campina', scene: 'acude-velho' });
   assert.equal(url, 'https://loficity-lac.vercel.app/#city=campina&scene=acude-velho');
-  assert.ok(!/wx=|debug|car=/.test(url));
+  assert.ok(!/wx=|debug|car=|bus=/.test(url));
 });
 
 test('card file name is safe and carries the time', () => {

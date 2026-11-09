@@ -7,11 +7,12 @@
    who:   who may say it (default: an ordinary passer-by). The Capelinha has no passers-by, only its
           scripted visitors, the priest and the congregation, so its phrases name their roles; the
           players at the Campo da Rodoviária and in the Praça da Cultura kick-about speak as 'player',
-          the volleyball players there as 'volley' and the school's students as 'student'. */
+          the volleyball players there as 'volley' and the school's students as 'student'. Inside the
+          bus (src/scenes/onibus.ts) the passengers speak as 'rider', the children on the school bus as 'pupil'. */
 
 export type Tod = 'manha' | 'tarde' | 'noite' | 'madrugada';
 export type WxTag = 'heat' | 'cold' | 'rain' | 'snow';
-export type Role = 'passerby' | 'visitor' | 'attendee' | 'priest' | 'player' | 'volley' | 'student';
+export type Role = 'passerby' | 'visitor' | 'attendee' | 'priest' | 'player' | 'volley' | 'student' | 'rider' | 'pupil';
 export interface Phrase { t: string; city?: string; scene?: string; tod?: Tod[]; wx?: WxTag; who?: Role[] }
 
 type Opt = Omit<Phrase, 't'>;
@@ -107,6 +108,26 @@ export const PHRASES: Phrase[] = [
   ...group({ scene: 'cinema-fachada-remigio', tod: ['noite'] }, ['Cinema de noite tem outro clima.']),
   ...group({ scene: 'cinema-fachada-remigio', who: ['visitor'] }, ['Será que ainda tem lugar?', 'Bora, que já vai começar!', 'Vou pegar uma pipoca grande.', 'Tô na fila desde cedo, visse?']),
   ...group({ scene: 'cinema-fachada-remigio', who: ['attendee'] }, ['Que filme arretado!', 'Aquela explosão, hein?', 'Vou voltar pra ver de novo.', 'Gostei do final, viu?']),
+
+  // ---------- inside the bus (src/scenes/onibus.ts): passengers and the children on the school bus ----------
+  ...group({ ...BR, who: ['rider'] }, [
+    'Motorista, desce na próxima!', 'Esse ônibus balança, visse?', 'Arrasta pra lá um tiquinho?', 'Vixe, esqueci de apertar o PARE!',
+    'Alguém tem troco de dez?', 'Vou cochilar até o ponto final.', 'Segura firme, que ele freia!', 'Pode sentar aqui, tá livre.',
+    'Esse motorista é bom de volante.',
+  ]),
+  ...group({ ...BR, who: ['rider'], tod: ['manha'] }, ['Bom dia, motorista!', 'Tô indo pro trabalho, visse?', 'Acordei cedinho pra pegar esse.']),
+  ...group({ ...BR, who: ['rider'], tod: ['tarde'] }, ['Vou resolver umas coisas no centro.', 'Vou visitar minha tia.']),
+  ...group({ ...BR, who: ['rider'], tod: ['noite'] }, ['Voltando do trabalho, cansado que só.', 'Ainda bem que peguei esse.']),
+  ...group({ ...BR, who: ['rider'], wx: 'rain' }, ['Fecha a janela que tá chovendo!', 'Chuva lá fora e eu aqui sequinho.']),
+  ...group({ ...BR, who: ['rider'], wx: 'heat' }, ['Abre a janela, por favor!', 'Que calor aqui dentro!']),
+  ...group({ ...BR, who: ['rider'], wx: 'cold' }, ['Fecha essa janela, que tá frio!']),
+  ...group({ city: 'campina', who: ['rider'] }, ['Desço no Açude Velho.', 'Vou pro Parque do Povo.', 'Desço no Terminal.']),
+  ...group({ city: 'esperanca', who: ['rider'] }, ['Vou pra Campina resolver umas coisas.', 'Desço ali perto do mercado.']),
+  ...group({ city: 'joaopessoa', who: ['rider'] }, ['Desço em Tambaú.', 'Vou pra orla.']),
+  ...group({ city: 'areia', who: ['rider'] }, ['Desço lá em cima, na ladeira.', 'Vou pro centro histórico.']),
+  ...group({ city: 'remigio', who: ['rider'] }, ['Desço perto da lagoa.', 'Vou pra Esperança e já volto.']),
+  ...group({ ...BR, who: ['pupil'] }, ['Tia, já chegamos?', 'Hoje tem educação física!', 'Senta comigo!', 'Esqueci a merenda em casa…', 'Me empresta um lápis?', 'Quem vai no recreio comigo?']),
+  ...group({ ...BR, who: ['pupil'], tod: ['tarde', 'noite'] }, ['Bora jogar bola depois da aula?']),
 
   // ---------- Tóquio (pt-BR simples, com um toque de japonês) ----------
   ...group(TK, ['Konnichiwa!', 'Arigatô!', 'Sumimasen, com licença!', 'Tóquio nunca dorme.', 'Vou pegar um onigiri.', 'Oi, tudo bem? Genki?']),

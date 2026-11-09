@@ -6,6 +6,7 @@ import { bay, mulberry32 } from '../engine/math';
 import { CBLUE, CGREEN, CNAVY, CRED, CYELL, HALO, LIGHT, MAG, MAGD, STEEL, VOID, WCOOL, WDIM, WHITE, CBEIGE, SNOW } from '../engine/palette';
 import { S } from '../sky/state';
 import { drawBr, setBrLanes, tapBr, updateBr } from './br-traffic';
+import type { BusSkin } from '../scenes/onibus-rules';
 
 type CarKind = 'taxi' | 'kei' | 'sedan' | 'truck' | 'bus' | 'moto';
 interface Car { on: boolean; x: number; dir: number; sp: number; lane: number; kind: CarKind; body: number; len: number; rider: number; pillion: boolean }
@@ -118,7 +119,7 @@ function drawCar(c: Car) {
 }
 
 /** A tapped car or bus (either city's traffic). */
-export function tapCars(x: number, y: number): { sound: 'moto' | 'car' | 'kombi' | 'bus' | 'truck' | 'bray' | 'som'; x: number; y: number } | null {
+export function tapCars(x: number, y: number): { sound: 'moto' | 'car' | 'kombi' | 'bus' | 'truck' | 'bray' | 'som'; x: number; y: number; board?: BusSkin | null } | null {
   if (style === 'br') return tapBr(x, y);
   for (const c of C) {
     if (!c.on) continue;

@@ -23,13 +23,15 @@ import { ruaFaustino } from './rua-faustino';
 import { ruaJoseBezerra } from './rua-jose-bezerra';
 import { ruaManoelRodrigues } from './rua-manoel-rodrigues';
 import { shrine } from './shrine';
+import { onibus } from './onibus';
+import { boardable } from './onibus-rules';
 import { terminalIntegracao } from './terminal-integracao';
 import type { Scene } from './types';
 
 export const SCENES: Record<CityId, Scene[]> = {
   tokyo: [rainCorner, neonAlley, konbini, shrine],
   esperanca: [praca, ruaComercio, capelinha, pracaCultura, campoRodoviaria, centroTeatro, armazemParaiba, ruaFaustino, ruaJoseBezerra, ruaManoelRodrigues],
-  campina: [acudeVelho, piramide, estacaoVelha, parqueCrianca, partage, terminalIntegracao],
+  campina: [acudeVelho, piramide, estacaoVelha, parqueCrianca, partage, terminalIntegracao, onibus],
   joaopessoa: [caboBranco],
   areia: [centroAreia],
   remigio: [lagoaRemigio, cinemaRemigio, cinemaFachada],
@@ -37,11 +39,15 @@ export const SCENES: Record<CityId, Scene[]> = {
 
 const LAST_KEY = 'loficity:lastScene:';
 
+/** The city's scenes plus the ones reached from inside them: the bus interior in every city whose buses
+    can be boarded (so #scene=onibus and the permalink work there too). Not in the random pick. */
+const reachable = (city: CityId): Scene[] => (boardable(city) && !SCENES[city].includes(onibus) ? [...SCENES[city], onibus] : SCENES[city]);
+
 /** #scene=<id> pins a scene; otherwise every load picks a random one, never the previous. */
 export function pickScene(city: CityId): Scene {
   const list = SCENES[city];
   const want = /scene=([\w-]+)/.exec(location.hash)?.[1];
-  const pinned = list.find((s) => s.id === want);
+  const pinned = reachable(city).find((s) => s.id === want);
   if (pinned) return pinned;
   let last: string | null = null;
   try { last = localStorage.getItem(LAST_KEY + city); } catch { /* storage unavailable */ }
@@ -52,7 +58,7 @@ export function pickScene(city: CityId): Scene {
 }
 
 /** A scene of the city by id (a door's `goto`), or null. */
-export const sceneById = (city: CityId, id: string): Scene | null => SCENES[city].find((s) => s.id === id) ?? null;
+export const sceneById = (city: CityId, id: string): Scene | null => reachable(city).find((s) => s.id === id) ?? null;
 
 export function nextScene(city: CityId, current: Scene): Scene {
   const list = SCENES[city];

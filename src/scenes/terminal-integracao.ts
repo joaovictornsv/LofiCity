@@ -365,12 +365,12 @@ export const terminalIntegracao: Scene = {
     const bays = BUSES.filter((b) => b.on);
     return `active  people x${peopleCount()}  ônibus x${bays.length} (${bays.filter((b) => b.st === 'dwell').length} na plataforma)  terminal ${operating() ? (rush() ? 'pico' : 'aberto') : 'fechado'}  pax ${Math.round(paxLevel() * 100)}%`;
   },
-  // tap a bus in the bays and it honks
+  // tap a bus in the bays: it honks and you board it (an STTP bus, src/scenes/onibus.ts)
   tap(x, y) {
     for (const b of BUSES) {
       if (!b.on) continue;
       const ly = laneY(b);
-      if (x >= b.x && x < b.x + LEN && y <= ly && y >= ly - 22) return { x: Math.round(b.x + LEN / 2), y: ly - 24, sfx: 'bus' };
+      if (x >= b.x && x < b.x + LEN && y <= ly && y >= ly - 22) return { x: Math.round(b.x + LEN / 2), y: ly - 24, sfx: 'bus', board: 'sttp' };
     }
     return null;
   },

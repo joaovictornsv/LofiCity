@@ -36,6 +36,8 @@ body.idle { cursor: none; }
 .bar button:hover { border-color: var(--muted); }
 .bar button[aria-pressed="true"] { color: var(--cyan); border-color: var(--cyan); }
 .bar button:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
+/* inside the bus: the way out stands out from the other controls */
+.bar #b-exit { color: var(--cyan); border-color: var(--cyan); }
 #debug {
   position: fixed; top: calc(var(--st) + 94px); /* below the eye and share buttons */ right: var(--sr);
   max-width: calc(100% - var(--sl) - var(--sr)); font: 11px/1.55 var(--font-data); background: var(--panel); color: var(--ink);

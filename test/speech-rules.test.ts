@@ -42,6 +42,7 @@ test('every scene, at every hour, has something to say for its speakers', () => 
       : scene === 'campo-rodoviaria' ? (['passerby', 'player'] as const)
       : scene === 'praca-cultura' ? (['passerby', 'student', 'player', 'volley'] as const)
       : scene === 'cinema-remigio' ? (['attendee'] as const)
+      : scene === 'onibus' ? (['rider', 'pupil'] as const)
       : scene === 'cinema-fachada-remigio' ? (['passerby', 'visitor', 'attendee'] as const) : (['passerby'] as const);
     for (const role of roles) {
       const c = ctx({ city, scene, hour, role, wx: { kind: 'unavailable', temp: null } });

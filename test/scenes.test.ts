@@ -69,8 +69,8 @@ test('only scenes whose photo shows a zebra wire up a crossing', () => {
 
 const CAMPINA_NEW = ['piramide-parque-do-povo', 'estacao-velha', 'parque-da-crianca', 'partage-shopping', 'terminal-integracao'];
 
-test('Campina Grande has Açude Velho first, then the five new scenes', () => {
-  assert.deepEqual(table.get('campina')!.map(sceneId), ['acude-velho', ...CAMPINA_NEW]);
+test('Campina Grande has Açude Velho first, then the five new scenes, then the bus interior', () => {
+  assert.deepEqual(table.get('campina')!.map(sceneId), ['acude-velho', ...CAMPINA_NEW, 'onibus']);
 });
 
 test('the developer guide lists each new Campina #scene id', () => {
@@ -120,4 +120,15 @@ test('the cinema is indoors: it never touches the weather and takes no Math.rand
   assert.doesNotMatch(src, /Math\.random\(/);
   assert.doesNotMatch(read('src/scenes/cinema-rules.ts'), /Math\.random\(|from '\.\.\/engine|document\.|window\./);
   assert.match(src, /grade\(\)/, 'lights itself (grade hook)');
+});
+
+test('the bus interior: listed in the guide, boarded from street buses and the terminal, no invented weather', () => {
+  const line = read('docs/DEVELOPING.md').split('\n').find((l) => l.startsWith('- `#scene='))!;
+  assert.ok(line.includes('`onibus`'), 'onibus in the #scene list');
+  const src = read('src/scenes/onibus.ts');
+  assert.doesNotMatch(src, /S\.(rain|snow|storm|cloud|fog|temp)\s*=[^=]/);
+  assert.match(read('src/actors/br-traffic.ts'), /board: skinForVehicle\(v\.kind\)/);
+  assert.match(read('src/scenes/terminal-integracao.ts'), /board: 'sttp'/);
+  assert.match(read('src/main.ts'), /if \(c\.board\) board\(c\.board\)/);
+  assert.match(read('index.html'), /id="b-exit" hidden/);
 });
