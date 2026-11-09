@@ -90,7 +90,7 @@ T city map, S scene, R radio, N next track, P switch station (Lo-fi / Neon), M a
 
 The city map is a pixel map of Paraíba with a pin per city, generated from the city registry; cities outside Paraíba (Tóquio) are listed under it. Esc, the × button or a tap outside closes it without changing the city.
 
-The eye button (top-right) hides the whole HUD, credit included, for a clean view; the choice is remembered. Hiding it does not pause the radio. Fullscreen is on the button and Enter only (no double-click), so quick taps on the scene never resize it.
+The eye button (top-right) hides the whole HUD, credit included, for a clean view; the choice is remembered. Hiding it does not pause the radio. The radio tries to start by itself on load; browsers block that until the page has had a gesture, so it then starts on the first tap or key press (unless the listener already used the radio controls). Fullscreen is on the button and Enter only (no double-click), so quick taps on the scene never resize it.
 
 ## Layout
 
