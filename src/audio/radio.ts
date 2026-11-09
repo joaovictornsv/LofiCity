@@ -253,6 +253,7 @@ for (const p of players) {
     if (p !== audio()) return;
     fails = 0; status = ''; clearTimers();
     fade(p, volume, FADE_IN_MS);
+    watchAutostart(p, gen);
     render(); void preloadNext();
   });
   p.addEventListener('waiting', () => {
@@ -281,13 +282,32 @@ function onGesture() {
 function blocked() {
   autoTry = false;
   playing = false; gen++; clearTimers(); clearInterval(fadeTimer);
-  status = ''; current = null; render();
-  for (const g of GESTURES) addEventListener(g, onGesture, { capture: true, passive: true });
+  status = ''; current = null;
+  for (const q of players) { q.pause(); q.removeAttribute('src'); q.load(); q.volume = volume; }
+  preloaded = null; queue = [];
+  render();
+  armGesture();
 }
+/** Chrome / Firefox can say up front whether a media element may start without a gesture. */
+function autoplayAllowed(): boolean {
+  const pol = (navigator as Navigator & { getAutoplayPolicy?: (t: string) => string }).getAutoplayPolicy;
+  try { return !pol || pol.call(navigator, 'mediaelement') === 'allowed'; } catch { return true; }
+}
+function armGesture() { for (const g of GESTURES) addEventListener(g, onGesture, { capture: true, passive: true }); }
 function autostart() {
   if (playing || touched) return;
+  // Not allowed (or unknown to be): do not even try, so no half-started stream is left looking "on".
+  if (!autoplayAllowed()) { armGesture(); return; }
   autoTry = true;
   start();
+}
+/** Autostart watchdog: some browsers neither reject play() nor play, so a stream that is not actually advancing counts as blocked. */
+function watchAutostart(p: HTMLAudioElement, my: number) {
+  if (!autoTry) return;
+  setTimeout(() => {
+    if (!autoTry || my !== gen || !playing) return;
+    if (p.paused || p.currentTime < 0.3 || p.muted) blocked(); else autoTry = false;
+  }, 2500);
 }
 
 /** After giving up, the listener's next Tocar/Próxima is a fresh try: forget the failures (likely an outage). */
