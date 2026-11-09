@@ -20,7 +20,8 @@ import { brTrafficDebug } from './actors/br-traffic';
 import { fireworksStats, updateSkyEvents, lightning } from './fx/sky-events';
 import { gradePalette } from './sky/grade';
 import { S, direct, settle, wxOverride } from './sky/state';
-import { CITIES, type City, cityById } from './sky/cities';
+import { type City, cityById } from './sky/cities';
+import { mountCityMap } from './ui/city-map';
 import { followLive, weatherView } from './sky/live';
 import { hudWeather, manualLightningAllowed } from './sky/weather-feed';
 import { updateSky } from './scenes/common';
@@ -157,11 +158,10 @@ function updateHud() {
 const showDebug = params.has('debug');
 $('debug').hidden = !showDebug;
 const press = (id: string, on: boolean) => $(id).setAttribute('aria-pressed', on ? 'true' : 'false');
-const sel = $('city') as HTMLSelectElement;
 function setCity(id: string) {
   city = cityById(id);
   try { localStorage.setItem('loficity:city', city.id); } catch { /* ignore */ }
-  sel.value = city.id;
+  cityMap.refresh();
   pinMoment();
   followLive(city);
   clearBubbles(); clearPeople();
@@ -180,7 +180,7 @@ addEventListener('pageshow', (e) => { if (e.persisted) syncBells(); }); // back 
 const actions: Record<string, () => void> = {
   sound: () => { press('b-sound', audio.toggle()); syncBells(); },
   crt: () => { opts.crt = !opts.crt; press('b-crt', opts.crt); },
-  city: () => setCity(CITIES[(CITIES.indexOf(city) + 1) % CITIES.length].id),
+  city: () => cityMap.open(),
   scene: () => { clearBubbles(); clearPeople(); scene = nextScene(city.id, scene); direct(simNow(), city, 0, scene.id); scene.build(); syncBells(); syncHash(); },
   music: () => radio.toggle(),
   station: () => radio.nextStation(),
@@ -197,9 +197,8 @@ const BUTTONS: [string, string][] = [
   ['b-sound', 'sound'], ['b-crt', 'crt'], ['b-scene', 'scene'], ['b-full', 'full'],
 ];
 for (const [id, a] of BUTTONS) $(id).addEventListener('click', actions[a]);
-for (const c of CITIES) sel.add(new Option(c.name, c.id));
-sel.value = city.id;
-sel.addEventListener('change', () => { setCity(sel.value); sel.blur(); });
+// City picker: a pixel map of Paraíba (src/ui/city-map.ts); it calls setCity, so transitions, weather and clock stay the same.
+const cityMap = mountCityMap({ trigger: $('city') as HTMLButtonElement, current: () => city.id, onPick: setCity });
 radio.mount($('radio'));
 // "rotate your phone" overlay (shown by CSS on upright touch screens); dismissal lasts for the session
 try { if (sessionStorage.getItem('loficity:portrait-ok')) document.body.classList.add('portrait-ok'); } catch { /* ignore */ }
@@ -283,6 +282,7 @@ const KEYS: Record<string, string> = {
 addEventListener('keydown', (e) => {
   const tag = (e.target as HTMLElement).tagName;
   if (tag === 'SELECT' || tag === 'INPUT' || (tag === 'BUTTON' && e.key === 'Enter')) return;
+  if (cityMap.isOpen()) return; // the map is modal: no scene shortcuts behind it (Esc closes it natively)
   if (e.ctrlKey || e.metaKey || e.altKey) return; // leave browser shortcuts (Ctrl +/-, Ctrl+H...) alone
   const a = KEYS[e.key.toLowerCase()];
   if (a) actions[a]();
@@ -324,7 +324,7 @@ function wake() {
   document.body.classList.remove('idle');
   clearTimeout(idleTimer);
   idleTimer = window.setTimeout(() => {
-    if (document.activeElement?.closest('.ui') || shareOpen) return; // keep controls up while one is focused or the share menu is open
+    if (document.activeElement?.closest('.ui, dialog[open]') || shareOpen) return; // keep controls up while one is focused, the city map or the share menu is open
     document.body.classList.add('idle'); $('hint').hidden = true;
   }, 3500);
   requestWake();

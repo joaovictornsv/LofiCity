@@ -108,12 +108,15 @@ body.idle .eye:focus-visible { opacity: 1; }
 
 /* city selector + temperature */
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.hud .city select {
-  font: inherit; letter-spacing: inherit; text-transform: uppercase; color: var(--cyan); background: transparent;
+.hud .city {
+  font: inherit; letter-spacing: inherit; text-transform: uppercase; color: var(--cyan); background: transparent; align-self: flex-start;
   border: 1px solid var(--line); border-radius: 2px; padding: 3px 6px; cursor: pointer; margin-bottom: 2px; min-height: var(--tap);
+  display: inline-flex; align-items: center; gap: 6px; max-width: 100%; text-shadow: inherit;
 }
-.hud .city select option { background: #0c0a1a; color: var(--ink); }
-.hud .city select:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
+.hud .city:hover { border-color: var(--muted); }
+.hud .city:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
+.hud .city .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hud .city .pin-ico { width: 10px; height: 10px; flex: none; color: var(--neon); }
 .hud .clock { display: flex; align-items: baseline; gap: 10px; }
 .hud .temp { font-size: 15px; color: #ffcf7a; text-shadow: 0 0 8px rgba(255, 179, 71, 0.45), 0 1px 2px #000; }
 .hud .live { color: #7dff8a; }
@@ -205,7 +208,7 @@ body.idle .credit { opacity: 0.4; }
   .hud .clock { font-size: 16px; } .hud .temp { font-size: 12px; }
   .hud .hint, #season { display: none; }
   .hud .live { display: block; } /* long stale/test badges get their own line instead of breaking into the weather text */
-  .hud .city select { padding: 2px 5px; }
+  .hud .city { padding: 2px 5px; }
   .radio { width: min(320px, calc(100% - var(--sl) - var(--sr))); font-size: 9px; padding: 6px 8px; gap: 4px; }
   .radio .ctl { gap: 4px; }
   .radio button { padding: 4px 6px; }
@@ -221,7 +224,7 @@ body.idle .credit { opacity: 0.4; }
   .hud .clock { font-size: 17px; gap: 8px; } .hud .temp { font-size: 12px; }
   .hud .hint, #season { display: none; }
   .hud .live { display: block; } /* long stale/test badges get their own line instead of breaking into the weather text */
-  .hud .city select { padding: 2px 5px; }
+  .hud .city { padding: 2px 5px; }
   /* the bottom of the frame is the scene; the sky under the HUD is free */
   .radio { bottom: auto; top: calc(var(--st) + var(--hud-h, 98px) + 10px); /* --hud-h: measured in main.ts */ font-size: 9px; padding: 6px 8px; gap: 4px; }
   .radio .ctl { gap: 4px; }
@@ -236,4 +239,45 @@ body.idle .credit { opacity: 0.4; }
   .share { top: calc(var(--st) + 42px); }
   .share-btn { width: 36px; height: 36px; padding: 8px; }
   .share-menu button { font-size: 10px; }
+}
+
+/* city map: a native modal dialog (top layer); closed it is display:none and takes no taps */
+.city-map {
+  padding: 0; border: 1px solid var(--line); border-radius: 2px; background: #0c0a1a; color: var(--ink); cursor: auto;
+  width: min(760px, calc(100vw - 32px), calc((100dvh - 150px) * 1.69 + 26px)); max-width: none; max-height: calc(100dvh - 16px); overflow: auto;
+  font-family: var(--font-ui); letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.6);
+}
+.city-map::backdrop { background: rgba(5, 4, 11, 0.7); }
+.cm-box { padding: 10px 12px 8px; display: flex; flex-direction: column; gap: 8px; }
+.cm-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cm-head h2 { margin: 0; font-size: 13px; font-weight: normal; color: var(--ink); text-shadow: 0 0 8px rgba(255, 79, 163, 0.5); }
+.city-map button {
+  font: inherit; letter-spacing: inherit; text-transform: inherit; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 2px; cursor: pointer; min-height: var(--tap); min-width: var(--tap); white-space: nowrap;
+}
+.city-map button:hover { border-color: var(--muted); }
+.city-map button:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; position: relative; z-index: 2; }
+.city-map button[aria-current="true"] { color: var(--cyan); border-color: var(--cyan); text-shadow: 0 0 6px rgba(79, 240, 255, 0.5); }
+.cm-close { font-size: 16px !important; line-height: 1; padding: 0; }
+.cm-map { position: relative; width: 100%; border: 1px solid var(--line); overflow: hidden; }
+.cm-map canvas, .cm-map .cm-ink { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.cm-map canvas { image-rendering: pixelated; }
+.cm-ink .lead { stroke: var(--muted); stroke-width: 1; opacity: 0.7; shape-rendering: crispEdges; }
+.cm-ink .lead.on { stroke: var(--cyan); opacity: 1; }
+.cm-ink .pin { fill: var(--neon); stroke: #05040b; stroke-width: 1; shape-rendering: crispEdges; }
+.cm-ink .pin.on { fill: var(--cyan); animation: pin-blink 1.2s steps(2, end) infinite; }
+@keyframes pin-blink { 50% { opacity: 0.35; } }
+.cm-pins, .cm-row { list-style: none; margin: 0; padding: 0; }
+.cm-pins button { position: absolute; left: 0; top: 0; font-size: 10px; padding: 0 7px; }
+.cm-world { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 10px; color: var(--muted); }
+.cm-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.cm-row button { font-size: 10px; padding: 0 8px; }
+.cm-src { margin: 0; font-size: 8px; color: var(--muted); opacity: 0.75; text-transform: none; }
+@media (prefers-reduced-motion: reduce) { .cm-ink .pin.on { animation: none; } }
+@media (max-width: 600px), (max-height: 500px) {
+  .city-map { width: min(760px, calc(100vw - 16px), calc((100dvh - 120px) * 1.69 + 20px)); }
+  .cm-box { padding: 8px 9px 6px; gap: 6px; }
+  .cm-head h2 { font-size: 11px; }
+  .cm-pins button, .cm-row button, .cm-world { font-size: 9px; }
+  .cm-pins button { padding: 0 5px; }
 }

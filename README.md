@@ -36,5 +36,6 @@ Cidades, cenários, opções de URL (`#city=`, `#scene=`, `#at=`, `#wx=`, `#debu
 
 - Código sob a licença [MIT](LICENSE).
 - Clima: [Open-Meteo](https://open-meteo.com/) (CC BY 4.0).
+- Mapa: contorno da Paraíba do [IBGE](https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais.html) (Malhas territoriais, simplificado), desenhado em código.
 - Música: transmitida do [Internet Archive](https://archive.org/), de selos como [Dusted Wax Kingdom](https://archive.org/details/dustedwaxkingdom), sob licenças Creative Commons (a lista completa está em [docs/DEVELOPING.md](docs/DEVELOPING.md#credits) e em `src/audio/radio.ts`). A música **não** faz parte deste repositório nem da licença MIT, e as licenças NC proíbem uso comercial.
 - O site usa [Vercel Web Analytics](https://vercel.com/docs/analytics) e [Speed Insights](https://vercel.com/docs/speed-insights), sem cookies.

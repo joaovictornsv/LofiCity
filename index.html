@@ -22,7 +22,7 @@
   <div id="bubbles" aria-live="polite"></div>
 
   <div class="hud ui">
-    <label class="city"><span class="sr">Cidade</span><select id="city" title="Trocar cidade (T)"></select></label>
+    <button id="city" class="city" type="button" aria-haspopup="dialog" title="Trocar cidade no mapa (T)"><span class="sr">Cidade: </span><span class="name"></span><svg class="pin-ico" viewBox="0 0 8 8" aria-hidden="true"><path d="M2 0h4v1h1v4h-1v1h-1v2h-2v-2h-1v-1h-1v-4h1zM3 2h2v2h-2z" fill="currentColor" fill-rule="evenodd"/></svg></button>
     <span class="clock"><span id="clock">--:--</span><span class="temp" id="temp"></span></span>
     <span class="sub" id="date"></span>
     <span class="sub"><span class="live" id="live" hidden title="Clima via Open-Meteo">● ao vivo</span> <span id="wx"></span></span>

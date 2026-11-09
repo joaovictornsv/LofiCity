@@ -6,7 +6,7 @@ Lo-fi pixel-art scenes that follow each city's **real clock** and **live weather
 
 **Live:** https://loficity-lac.vercel.app
 
-**Cities** (pick one in the selector; Esperança is the default)
+**Cities** (pick one on the map: tap the city name in the panel or press T; Esperança is the default)
 
 - **Campina Grande**: fireworks most nights of its famous São João in June.
   - `Açude Velho`: the glass drums of the Museu de Arte Popular (the "Três Pandeiros") and the high-rises mirrored in the water.
@@ -86,7 +86,9 @@ Nothing is uploaded or posted; the person sends the link or image themselves. Th
 
 ## Keys
 
-T city, S scene, R radio, N next track, P switch station (Lo-fi / Neon), M ambient sound, C CRT, H hide/show the panels, Enter fullscreen. L triggers a lightning strike only in test mode (`#debug` or a `#wx=` override); in normal use it does nothing and lightning comes only from real storm data.
+T city map, S scene, R radio, N next track, P switch station (Lo-fi / Neon), M ambient sound, C CRT, H hide/show the panels, Enter fullscreen. L triggers a lightning strike only in test mode (`#debug` or a `#wx=` override); in normal use it does nothing and lightning comes only from real storm data.
+
+The city map is a pixel map of Paraíba with a pin per city, generated from the city registry; cities outside Paraíba (Tóquio) are listed under it. Esc, the × button or a tap outside closes it without changing the city.
 
 The eye button (top-right) hides the whole HUD, credit included, for a clean view; the choice is remembered. Hiding it does not pause the radio. Fullscreen is on the button and Enter only (no double-click), so quick taps on the scene never resize it.
 
@@ -97,12 +99,14 @@ The eye button (top-right) hides the whole HUD, credit included, for a clean vie
 - `src/fx`: rain, snow, petals and leaves, lightning, fireworks
 - `src/actors`: pedestrians, cars and motorcycles, trees
 - `src/scenes`: shared passes, the Esperança prop kit (`br-kit.ts`) and one file per scene
+- `src/ui`: the city map (`map-rules.ts` holds the pure, unit-tested projection, label layout and pick/dismiss rules; `paraiba.ts` the state outline)
 - `src/audio`: generative ambience, synthesized SFX and church bells (`bells-schedule.ts` holds the pure rules and `bells-scheduler.ts` the timer, both unit-tested), and the radio
 - `test`: `node --test` unit tests
 
 ## Credits
 
 - **Weather**: [Open-Meteo](https://open-meteo.com/) (CC BY 4.0). No API key; refreshes every 10 minutes. Weather is never simulated: if a fetch fails, the last real reading for that city stays on screen marked "dados de HH:MM · sem atualização" (for up to 12 h); with no reading the HUD says "clima indisponível" over a neutral sky with no rain, snow, storm or fog. Failures are retried 3 times (15 s, 1 min, 3 min), then every 10 minutes until the API answers again.
+- **Map**: Paraíba outline from [IBGE](https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais.html) (Malhas territoriais, simplified), public data reused with credit; it is drawn in code as pixels, no map tiles or API.
 - **Music**: streamed from the [Internet Archive](https://archive.org/), released by their labels under Creative Commons licenses. The radio shows each track's artist, album and license with a link to the original page.
   - **Lo-Fi City** (amber; instrumental lo-fi beats, no vocals): 10 albums from the [Dusted Wax Kingdom](https://archive.org/details/dustedwaxkingdom) netlabel that the label itself describes as instrumental hip-hop: Kova (*Cookin' Session*), deeB (*Daydream*, *Thru Nature*), Romo (*Listen, Love*), Thegntlmn (*Earbuds* vol. 1 and 2), Derlee (*Mellow Morning*), Fredo (*First Movements*), DJ Mentos (*Field of Vision*) and JCreate (*Musical Introspection*) (CC BY-NC-ND 3.0/4.0).
   - **Neon FM** (magenta; dreamwave, chillsynth, chillwave): Lee Rosevere (*Synthcronicity*, Happy Puppy Records, CC BY-NC 3.0), Proton 42 (*Sub-Suburbia*, Cian Orbe, CC BY-NC-ND 4.0), Psychadelik Pedestrian (*All Of Time*, Toucan Music, CC BY-NC-SA 4.0), Kansas Beach Patrol (*Coast to Coast*, CC BY 3.0), Evenings (*North Dorm EP*, mam!records, CC BY-NC-ND 3.0), Tiiiza (*W8 EP*, Subwise, CC BY-ND 3.0) and District Lost (*Beyond Comprehension*, CC BY-NC-ND 4.0).
